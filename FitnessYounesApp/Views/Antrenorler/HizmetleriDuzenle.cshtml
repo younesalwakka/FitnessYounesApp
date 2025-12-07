@@ -1,0 +1,40 @@
+﻿@model FitnessYounesApp.ViewModels.AntrenorHizmetSecimViewModel
+
+@{
+    ViewData["Title"] = "Antrenor Hizmetleri Duzenle";
+}
+
+<h1>Antrenor Hizmetleri Duzenle</h1>
+
+<h4>@Model.AntrenorAdSoyad</h4>
+<hr />
+
+<form asp-action="HizmetleriDuzenle" method="post">
+    <input type="hidden" name="antrenorId" value="@Model.AntrenorId" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sec</th>
+                <th>Hizmet Adi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Model.Hizmetler)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox"
+                               name="seciliHizmetler"
+                               value="@h.HizmetId"
+                        @(h.SeciliMi ? "checked" : "") />
+                    </td>
+                    <td>@h.HizmetAd</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary">Geri Don</a>
+</form>
