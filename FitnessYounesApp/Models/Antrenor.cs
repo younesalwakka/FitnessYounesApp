@@ -22,5 +22,8 @@
         public ICollection<Randevu> Randevular { get; set; } = new List<Randevu>();
 
         public string TamAd => $"{Ad} {Soyad}";
+
+        public string AdSoyad => $"{Ad} {Soyad}";
+
     }
 }

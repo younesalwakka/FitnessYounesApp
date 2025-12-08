@@ -1,0 +1,45 @@
+﻿@model IEnumerable<FitnessYounesApp.Models.Randevu>
+
+@{
+    ViewData["Title"] = "Randevular";
+}
+
+<h1>Randevular</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Antrenor</th>
+            <th>Uye</th>
+            <th>Hizmet</th>
+            <th>Baslangic</th>
+            <th>Bitis</th>
+            <th>Ucret</th>
+            <th>Durum</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Antrenor?.AdSoyad</td>
+                <td>@item.UyeProfil?.AdSoyad</td>
+                <td>@item.Hizmet?.Ad</td>
+                <td>@item.Baslangic</td>
+                <td>@item.Bitis</td>
+                <td>@item.Ucret</td>
+                <td>@item.Durum</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
