@@ -1,71 +1,102 @@
 ﻿@model FitnessYounesApp.Models.Randevu
-@using FitnessYounesApp.Models
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Yeni Randevu";
 }
 
-<h1>Create</h1>
-
-<h4>Randevu</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="AntrenorId" class="control-label"></label>
-                <select asp-for="AntrenorId" class="form-control" asp-items="ViewBag.AntrenorId"></select>
-                <span asp-validation-for="AntrenorId" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="UyeProfilId" class="control-label"></label>
-                <select asp-for="UyeProfilId" class="form-control" asp-items="ViewBag.UyeProfilId"></select>
-                <span asp-validation-for="UyeProfilId" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="HizmetId" class="control-label"></label>
-                <select asp-for="HizmetId" class="form-control" asp-items="ViewBag.HizmetId"></select>
-                <span asp-validation-for="HizmetId" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Baslangic" class="control-label"></label>
-                <input asp-for="Baslangic" class="form-control" type="datetime-local" />
-                <span asp-validation-for="Baslangic" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Bitis" class="control-label"></label>
-                <input asp-for="Bitis" class="form-control" type="datetime-local" />
-                <span asp-validation-for="Bitis" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Ucret" class="control-label"></label>
-                <input asp-for="Ucret" class="form-control" />
-                <span asp-validation-for="Ucret" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Durum" class="control-label"></label>
-                <select asp-for="Durum" class="form-control"
-                        asp-items="Html.GetEnumSelectList<RandevuDurumu>()"></select>
-                <span asp-validation-for="Durum" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mt-2">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Yeni Randevu Oluştur</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">← Randevu listesine dön</a>
     </div>
-</div>
 
-<div class="mt-2">
-    <a asp-action="Index">Back to List</a>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <form asp-action="Create">
+
+                        <h5 class="mb-3">Temel Bilgiler</h5>
+                        <hr />
+
+                        <!-- Antrenor -->
+                        <div class="mb-3">
+                            <label asp-for="AntrenorId" class="form-label"></label>
+                            <select asp-for="AntrenorId" class="form-select" asp-items="ViewBag.AntrenorId">
+                                <option value="">-- Antrenör seçin --</option>
+                            </select>
+                            <span asp-validation-for="AntrenorId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Uye -->
+                        <div class="mb-3">
+                            <label asp-for="UyeProfilId" class="form-label"></label>
+                            <select asp-for="UyeProfilId" class="form-select" asp-items="ViewBag.UyeProfilId">
+                                <option value="">-- Üye seçin --</option>
+                            </select>
+                            <span asp-validation-for="UyeProfilId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Hizmet -->
+                        <div class="mb-3">
+                            <label asp-for="HizmetId" class="form-label"></label>
+                            <select asp-for="HizmetId" class="form-select" asp-items="ViewBag.HizmetId">
+                                <option value="">-- Hizmet seçin --</option>
+                            </select>
+                            <span asp-validation-for="HizmetId" class="text-danger"></span>
+                        </div>
+
+
+                        <h5 class="mt-4 mb-3">Zaman ve Ücret</h5>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Baslangic" class="form-label"></label>
+                                <input asp-for="Baslangic" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="Baslangic" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Bitis" class="form-label"></label>
+                                <input asp-for="Bitis" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="Bitis" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Ucret -->
+                        <div class="mb-3">
+                            <label asp-for="Ucret" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₺</span>
+                                <input asp-for="Ucret" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Ucret" class="text-danger"></span>
+                        </div>
+
+                        <!-- Durum -->
+                        <div class="mb-4">
+                            <label asp-for="Durum" class="form-label"></label>
+                            <select asp-for="Durum" class="form-select" asp-items="Html.GetEnumSelectList<FitnessYounesApp.Models.RandevuDurumu>()">
+                                <option value="">-- Durum seçin --</option>
+                            </select>
+                            <span asp-validation-for="Durum" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Randevu Oluştur</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

@@ -69,17 +69,37 @@ namespace FitnessYounesApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(randevu);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // 1) Double booking kontrolu:
+                // Aynı antrenor icin, zaman araliklari cakisiyor mu?
+                bool cakisanRandevuVar = await _context.Randevular
+                    .AnyAsync(r =>
+                        r.AntrenorId == randevu.AntrenorId &&     // ayni antrenor
+                        r.Baslangic < randevu.Bitis &&            // eski baslangic < yeni bitis
+                        r.Bitis > randevu.Baslangic               // eski bitis > yeni baslangic
+                    );
+
+                if (cakisanRandevuVar)
+                {
+                    // Genel bir model hatasi ekliyoruz, sayfanin ustundeki validation summary'de gozukur
+                    ModelState.AddModelError(string.Empty,
+                        "Secilen zaman araliginda bu antrenor icin baska bir randevu zaten var.");
+                }
+                else
+                {
+                    _context.Add(randevu);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
-            ViewData["AntrenorId"] = new SelectList(_context.Antrenorler, "Id", "AdSoyad", randevu.AntrenorId);
+            // Eger hata olursa dropdown'lari yeniden doldurmamiz lazim
+            ViewData["AntrenorId"] = new SelectList(_context.Antrenorler, "Id", "Ad", randevu.AntrenorId);
             ViewData["HizmetId"] = new SelectList(_context.Hizmetler, "Id", "Ad", randevu.HizmetId);
             ViewData["UyeProfilId"] = new SelectList(_context.UyeProfiller, "Id", "AdSoyad", randevu.UyeProfilId);
 
             return View(randevu);
         }
+
 
         // GET: Randevular/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -114,31 +134,49 @@ namespace FitnessYounesApp.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                // 1) Double booking kontrolu (Edit icin):
+                bool cakisanRandevuVar = await _context.Randevular
+                    .AnyAsync(r =>
+                        r.AntrenorId == randevu.AntrenorId &&
+                        r.Id != randevu.Id &&                    // kendisini hariç tut
+                        r.Baslangic < randevu.Bitis &&
+                        r.Bitis > randevu.Baslangic
+                    );
+
+                if (cakisanRandevuVar)
                 {
-                    _context.Update(randevu);
-                    await _context.SaveChangesAsync();
+                    ModelState.AddModelError(string.Empty,
+                        "Secilen zaman araliginda bu antrenor icin baska bir randevu zaten var.");
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!RandevuExists(randevu.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(randevu);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!RandevuExists(randevu.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
 
-            ViewData["AntrenorId"] = new SelectList(_context.Antrenorler, "Id", "AdSoyad", randevu.AntrenorId);
+            ViewData["AntrenorId"] = new SelectList(_context.Antrenorler, "Id", "Ad", randevu.AntrenorId);
             ViewData["HizmetId"] = new SelectList(_context.Hizmetler, "Id", "Ad", randevu.HizmetId);
             ViewData["UyeProfilId"] = new SelectList(_context.UyeProfiller, "Id", "AdSoyad", randevu.UyeProfilId);
 
             return View(randevu);
         }
+
 
         // GET: Randevular/Delete/5
         public async Task<IActionResult> Delete(int? id)
