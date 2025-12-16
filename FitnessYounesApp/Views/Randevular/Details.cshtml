@@ -14,19 +14,19 @@
             @Html.DisplayNameFor(model => model.Antrenor)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Antrenor.Id)
+            @(Model.Antrenor?.AdSoyad ?? "N/A")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Hizmet)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Hizmet.Id)
+            @(Model.Hizmet?.Ad ?? "N/A")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.UyeProfil)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UyeProfil.Id)
+            @(Model.UyeProfil?.AdSoyad ?? "N/A")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Baslangic)

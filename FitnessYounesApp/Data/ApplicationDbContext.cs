@@ -39,6 +39,15 @@ namespace FitnessYounesApp.Data
                 .HasOne(ah => ah.Hizmet)
                 .WithMany(h => h.AntrenorHizmetleri)
                 .HasForeignKey(ah => ah.HizmetId);
+
+            // Decimal precision for Ucret fields
+            builder.Entity<Hizmet>()
+                .Property(h => h.Ucret)
+                .HasPrecision(18, 2);
+
+            builder.Entity<Randevu>()
+                .Property(r => r.Ucret)
+                .HasPrecision(18, 2);
         }
     }
 }

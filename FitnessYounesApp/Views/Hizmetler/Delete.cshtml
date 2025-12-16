@@ -39,7 +39,7 @@
             @Html.DisplayNameFor(model => model.SporSalonu)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SporSalonu.Id)
+            @(Model.SporSalonu?.Ad ?? "N/A")
         </dd>
     </dl>
     
