@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FitnessYounesApp.Data;
+using FitnessYounesApp.Models;
 
 namespace FitnessYounesApp.Controllers
 {
@@ -17,27 +18,30 @@ namespace FitnessYounesApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var dashboardData = new DashboardViewModel
+            var model = new DashboardViewModel
             {
                 ToplamSporSalonu = await _context.SporSalonlari.CountAsync(),
                 ToplamAntrenor = await _context.Antrenorler.CountAsync(),
                 ToplamUye = await _context.UyeProfiller.CountAsync(),
                 ToplamRandevu = await _context.Randevular.CountAsync(),
+
                 BekleyenRandevular = await _context.Randevular
-                    .Where(r => r.Durum == Models.RandevuDurumu.Beklemede)
+                    .Where(r => r.Durum == RandevuDurumu.Beklemede)
                     .CountAsync(),
+
                 OnaylananRandevular = await _context.Randevular
-                    .Where(r => r.Durum == Models.RandevuDurumu.Onaylandi)
+                    .Where(r => r.Durum == RandevuDurumu.Onaylandi)
                     .CountAsync(),
+
                 ToplamHizmet = await _context.Hizmetler.CountAsync(),
+
                 BuAyRandevular = await _context.Randevular
-                    .Where(r => r.Baslangic.Month == DateTime.Now.Month && 
+                    .Where(r => r.Baslangic.Month == DateTime.Now.Month &&
                                 r.Baslangic.Year == DateTime.Now.Year)
                     .CountAsync()
             };
 
-            // Son randevular
-            dashboardData.SonRandevular = await _context.Randevular
+            model.SonRandevular = await _context.Randevular
                 .Include(r => r.Antrenor)
                 .Include(r => r.Hizmet)
                 .Include(r => r.UyeProfil)
@@ -45,8 +49,7 @@ namespace FitnessYounesApp.Controllers
                 .Take(5)
                 .ToListAsync();
 
-            // En çok randevu alan antrenörler
-            dashboardData.PopulerAntrenorler = await _context.Antrenorler
+            model.PopulerAntrenorler = await _context.Antrenorler
                 .Select(a => new PopulerAntrenorViewModel
                 {
                     AntrenorAdi = a.AdSoyad,
@@ -56,7 +59,24 @@ namespace FitnessYounesApp.Controllers
                 .Take(5)
                 .ToListAsync();
 
-            return View(dashboardData);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDurum(int randevuId, int durum)
+        {
+            var randevu = await _context.Randevular.FirstOrDefaultAsync(r => r.Id == randevuId);
+            if (randevu == null) return NotFound();
+
+            if (!Enum.IsDefined(typeof(RandevuDurumu), durum))
+                return BadRequest("Invalid Durum");
+
+            randevu.Durum = (RandevuDurumu)durum;
+            await _context.SaveChangesAsync();
+
+            TempData["DurumMessage"] = $"Randevu durumu güncellendi: {randevu.Durum}";
+            return RedirectToAction(nameof(Index));
         }
     }
 
@@ -70,7 +90,8 @@ namespace FitnessYounesApp.Controllers
         public int OnaylananRandevular { get; set; }
         public int ToplamHizmet { get; set; }
         public int BuAyRandevular { get; set; }
-        public List<Models.Randevu> SonRandevular { get; set; } = new();
+
+        public List<Randevu> SonRandevular { get; set; } = new();
         public List<PopulerAntrenorViewModel> PopulerAntrenorler { get; set; } = new();
     }
 
@@ -80,4 +101,3 @@ namespace FitnessYounesApp.Controllers
         public int RandevuSayisi { get; set; }
     }
 }
-
