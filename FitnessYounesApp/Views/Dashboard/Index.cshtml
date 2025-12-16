@@ -1,0 +1,142 @@
+@model FitnessYounesApp.Controllers.DashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Spor Salonu</h5>
+                    <h2 class="card-text">@Model.ToplamSporSalonu</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Antrenör</h5>
+                    <h2 class="card-text">@Model.ToplamAntrenor</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Üye</h5>
+                    <h2 class="card-text">@Model.ToplamUye</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Randevu</h5>
+                    <h2 class="card-text">@Model.ToplamRandevu</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Bekleyen Randevular</h5>
+                    <h2 class="card-text">@Model.BekleyenRandevular</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Onaylanan Randevular</h5>
+                    <h2 class="card-text">@Model.OnaylananRandevular</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-secondary">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Hizmet</h5>
+                    <h2 class="card-text">@Model.ToplamHizmet</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Bu Ay Randevular</h5>
+                    <h2 class="card-text">@Model.BuAyRandevular</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Appointments -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Son Randevular</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Üye</th>
+                                    <th>Antrenör</th>
+                                    <th>Hizmet</th>
+                                    <th>Tarih</th>
+                                    <th>Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var randevu in Model.SonRandevular)
+                                {
+                                    <tr>
+                                        <td>@randevu.UyeProfil?.AdSoyad</td>
+                                        <td>@randevu.Antrenor?.AdSoyad</td>
+                                        <td>@randevu.Hizmet?.Ad</td>
+                                        <td>@randevu.Baslangic.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            <span class="badge bg-@(randevu.Durum == FitnessYounesApp.Models.RandevuDurumu.Onaylandi ? "success" : randevu.Durum == FitnessYounesApp.Models.RandevuDurumu.Beklemede ? "warning" : "danger")">
+                                                @randevu.Durum
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Trainers -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Popüler Antrenörler</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        @foreach (var antrenor in Model.PopulerAntrenorler)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @antrenor.AntrenorAdi
+                                <span class="badge bg-primary rounded-pill">@antrenor.RandevuSayisi</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

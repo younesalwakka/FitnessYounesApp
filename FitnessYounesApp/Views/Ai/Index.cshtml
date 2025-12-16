@@ -1,0 +1,105 @@
+@model FitnessYounesApp.Controllers.ExerciseRecommendationRequest
+@{
+    ViewData["Title"] = "AI Egzersiz Önerisi";
+}
+
+<div class="container">
+    <h1 class="mb-4">🤖 AI ile Kişiselleştirilmiş Egzersiz Önerisi</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Vücut Bilgilerinizi Girin</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="GetExerciseRecommendation" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Boy" class="form-label">Boy (cm)</label>
+                            <input asp-for="Boy" class="form-control" placeholder="Örn: 175" />
+                            <span asp-validation-for="Boy" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Kilo" class="form-label">Kilo (kg)</label>
+                            <input asp-for="Kilo" class="form-control" placeholder="Örn: 70" />
+                            <span asp-validation-for="Kilo" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="VucutTipi" class="form-label">Vücut Tipi</label>
+                            <select asp-for="VucutTipi" class="form-select">
+                                <option value="">Seçiniz...</option>
+                                <option value="Ektomorf">Ektomorf (İnce, zor kilo alan)</option>
+                                <option value="Mezomorf">Mezomorf (Atletik, kaslı)</option>
+                                <option value="Endomorf">Endomorf (Yuvarlak, kolay kilo alan)</option>
+                            </select>
+                            <span asp-validation-for="VucutTipi" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Hedef" class="form-label">Hedef</label>
+                            <select asp-for="Hedef" class="form-select">
+                                <option value="">Seçiniz...</option>
+                                <option value="Kilo Verme">Kilo Verme</option>
+                                <option value="Kilo Alma">Kilo Alma</option>
+                                <option value="Kas Geliştirme">Kas Geliştirme</option>
+                                <option value="Güç Artırma">Güç Artırma</option>
+                                <option value="Genel Sağlık">Genel Sağlık ve Fitness</option>
+                            </select>
+                            <span asp-validation-for="Hedef" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EkstraBilgi" class="form-label">Ek Bilgiler (İsteğe bağlı)</label>
+                            <textarea asp-for="EkstraBilgi" class="form-control" rows="3" placeholder="Örn: Diz sakatlığım var, yoga yapmayı seviyorum..."></textarea>
+                            <span asp-validation-for="EkstraBilgi" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Fotograf" class="form-label">Fotoğraf Yükle (İsteğe bağlı)</label>
+                            <input asp-for="Fotograf" type="file" class="form-control" accept="image/*" />
+                            <small class="form-text text-muted">Vücut fotoğrafınızı yükleyebilirsiniz (gelecekte AI analizi için)</small>
+                            <span asp-validation-for="Fotograf" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-robot"></i> AI Önerisi Al
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5>AI Önerisi</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Recommendation != null)
+                    {
+                        <div class="alert alert-info">
+                            <pre style="white-space: pre-wrap; font-family: inherit;">@ViewBag.Recommendation</pre>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-info-circle" style="font-size: 3rem;"></i>
+                            <p class="mt-3">Lütfen sol taraftaki formu doldurarak AI'dan kişiselleştirilmiş egzersiz ve diyet önerisi alın.</p>
+                            <p><small>Not: OpenAI API anahtarı yapılandırılmamışsa, örnek bir öneri gösterilecektir.</small></p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
