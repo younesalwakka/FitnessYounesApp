@@ -22,10 +22,27 @@
                         <h5 class="mb-3">Temel Bilgiler</h5>
                         <hr />
 
+                        <!-- Hizmet (FIRST) -->
+                        <div class="mb-3">
+                            <label asp-for="HizmetId" class="form-label"></label>
+                            <select asp-for="HizmetId" class="form-select" asp-items="ViewBag.HizmetId" id="HizmetId">
+                                <option value="">-- Hizmet seçin --</option>
+                            </select>
+                            <span asp-validation-for="HizmetId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Spor Salonu (depends on Hizmet) -->
+                        <div class="mb-3">
+                            <label class="form-label">Spor Salonu</label>
+                            <select class="form-select" id="SporSalonuId" name="SporSalonuId" disabled>
+                                <option value="">-- Spor Salonu seçin --</option>
+                            </select>
+                        </div>
+
                         <!-- Antrenor -->
                         <div class="mb-3">
                             <label asp-for="AntrenorId" class="form-label"></label>
-                            <select asp-for="AntrenorId" class="form-select" asp-items="ViewBag.AntrenorId">
+                            <select asp-for="AntrenorId" class="form-select" asp-items="ViewBag.AntrenorId" id="AntrenorId" disabled>
                                 <option value="">-- Antrenör seçin --</option>
                             </select>
                             <span asp-validation-for="AntrenorId" class="text-danger"></span>
@@ -39,16 +56,6 @@
                             </select>
                             <span asp-validation-for="UyeProfilId" class="text-danger"></span>
                         </div>
-
-                        <!-- Hizmet -->
-                        <div class="mb-3">
-                            <label asp-for="HizmetId" class="form-label"></label>
-                            <select asp-for="HizmetId" class="form-select" asp-items="ViewBag.HizmetId">
-                                <option value="">-- Hizmet seçin --</option>
-                            </select>
-                            <span asp-validation-for="HizmetId" class="text-danger"></span>
-                        </div>
-
 
                         <h5 class="mt-4 mb-3">Zaman ve Ücret</h5>
                         <hr />
@@ -103,4 +110,99 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        const hizmetSelect = document.getElementById("HizmetId");
+        const salonSelect = document.getElementById("SporSalonuId");
+        const antrenorSelect = document.getElementById("AntrenorId");
+
+        function resetSalon(message = "-- Spor Salonu seçin --") {
+            salonSelect.innerHTML = `<option value="">${message}</option>`;
+            salonSelect.disabled = true;
+        }
+
+        function resetAntrenor(message = "-- Antrenör seçin --") {
+            antrenorSelect.innerHTML = `<option value="">${message}</option>`;
+            antrenorSelect.disabled = true;
+        }
+
+        // ✅ Hizmet -> Salon
+        hizmetSelect.addEventListener("change", async function () {
+            resetSalon();
+            resetAntrenor();
+
+            const hizmetId = this.value;
+            if (!hizmetId) return;
+
+            try {
+                const res = await fetch(`/Randevular/GetSporSalonlariByHizmet?hizmetId=${encodeURIComponent(hizmetId)}`);
+                if (!res.ok) {
+                    console.error("GetSporSalonlariByHizmet failed:", res.status);
+                    resetSalon("Salonlar yüklenemedi");
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    resetSalon("Bu hizmet için salon yok");
+                    return;
+                }
+
+                data.forEach(s => {
+                    const opt = document.createElement("option");
+                    opt.value = s.id;
+                    opt.textContent = s.ad;
+                    salonSelect.appendChild(opt);
+                });
+
+                salonSelect.disabled = false; // ✅ افتح النادي
+            } catch (err) {
+                console.error("Salon fetch error:", err);
+                resetSalon("Salonlar yüklenemedi");
+            }
+        });
+
+        // ✅ Salon -> Antrenor
+        salonSelect.addEventListener("change", async function () {
+            resetAntrenor();
+
+            const hizmetId = hizmetSelect.value;
+            const salonId = salonSelect.value;
+
+            if (!hizmetId || !salonId) return;
+
+            try {
+                const url = `/Randevular/GetAntrenorlerByHizmetVeSalon?hizmetId=${encodeURIComponent(hizmetId)}&sporSalonuId=${encodeURIComponent(salonId)}`;
+                const res = await fetch(url);
+
+                if (!res.ok) {
+                    console.error("GetAntrenorlerByHizmetVeSalon failed:", res.status);
+                    resetAntrenor("Antrenörler yüklenemedi");
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    resetAntrenor("Bu salon için antrenör yok");
+                    return;
+                }
+
+                data.forEach(a => {
+                    const opt = document.createElement("option");
+                    opt.value = a.id;
+                    opt.textContent = a.adSoyad;
+                    antrenorSelect.appendChild(opt);
+                });
+
+                antrenorSelect.disabled = false; // ✅ افتح المدربين
+            } catch (err) {
+                console.error("Antrenor fetch error:", err);
+                resetAntrenor("Antrenörler yüklenemedi");
+            }
+        });
+    </script>
+
+
 }

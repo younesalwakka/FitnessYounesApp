@@ -17,6 +17,69 @@ namespace FitnessYounesApp.Controllers
             _context = context;
         }
 
+      
+        // ✅ STEP 1: Get gyms that offer the selected service (by Hizmet name)
+        [HttpGet]
+        public async Task<IActionResult> GetSporSalonlariByHizmet(int hizmetId)
+        {
+            // 1) get selected hizmet name
+            var hizmetAd = await _context.Hizmetler
+                .Where(h => h.Id == hizmetId)
+                .Select(h => h.Ad)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrWhiteSpace(hizmetAd))
+                return Json(new object[] { });
+
+            // 2) get all gyms that have a hizmet with same name
+            var salonlar = await _context.Hizmetler
+                .Where(h => h.Ad == hizmetAd)
+                .Select(h => new
+                {
+                    id = h.SporSalonuId,
+                    ad = h.SporSalonu!.Ad
+                })
+                .Distinct()
+                .OrderBy(x => x.ad)
+                .ToListAsync();
+
+            return Json(salonlar);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAntrenorlerByHizmetVeSalon(int hizmetId, int sporSalonuId)
+        {
+            // نجيب اسم الخدمة
+            var hizmetAd = await _context.Hizmetler
+                .Where(h => h.Id == hizmetId)
+                .Select(h => h.Ad)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrWhiteSpace(hizmetAd))
+                return Json(Array.Empty<object>());
+
+            var antrenorler = await _context.AntrenorHizmetleri
+                .Where(ah =>
+                    ah.Hizmet!.Ad == hizmetAd &&
+                    ah.Antrenor!.SporSalonuId == sporSalonuId
+                )
+                .Select(ah => new
+                {
+                    id = ah.AntrenorId,
+                    adSoyad = ah.Antrenor!.Ad + " " + ah.Antrenor!.Soyad   // ✅ بدل AdSoyad
+                })
+                .Distinct()
+                .OrderBy(x => x.adSoyad)
+                .ToListAsync();
+
+            return Json(antrenorler);
+        }
+
+
+
+
+
         // GET: Randevular
         // هنا نستخدم Include حتى نجلب بيانات الانترنور والخدمة والعضو مع الحجز
         public async Task<IActionResult> Index()
@@ -52,15 +115,22 @@ namespace FitnessYounesApp.Controllers
         }
 
         // GET: Randevular/Create
+        // GET: Randevular/Create
         public IActionResult Create()
         {
-            // قوائم الاختيار: انترنور – خدمة – عضو
-            ViewData["AntrenorId"] = new SelectList(_context.Antrenorler, "Id", "AdSoyad");
+            // 1) الخدمة تظهر عادي
             ViewData["HizmetId"] = new SelectList(_context.Hizmetler, "Id", "Ad");
+
+            // 2) النادي والمدربين: فارغين بالبداية (سنملأهم لاحقًا بالـ JavaScript)
+            ViewData["SporSalonuId"] = new SelectList(Enumerable.Empty<SelectListItem>());
+            ViewData["AntrenorId"] = new SelectList(Enumerable.Empty<SelectListItem>());
+
+            // 3) العضو عادي
             ViewData["UyeProfilId"] = new SelectList(_context.UyeProfiller, "Id", "AdSoyad");
 
             return View();
         }
+
 
         // POST: Randevular/Create
         [HttpPost]
@@ -99,7 +169,6 @@ namespace FitnessYounesApp.Controllers
 
             return View(randevu);
         }
-
 
         // GET: Randevular/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -176,7 +245,6 @@ namespace FitnessYounesApp.Controllers
 
             return View(randevu);
         }
-
 
         // GET: Randevular/Delete/5
         public async Task<IActionResult> Delete(int? id)
