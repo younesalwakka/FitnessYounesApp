@@ -50,6 +50,7 @@ namespace FitnessYounesApp.Controllers
 
         // 4) Create (GET)
         // عرض فورم اضافة مدرب جديد + قائمة بالصالات
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["SporSalonuId"] = new SelectList(
@@ -64,6 +65,7 @@ namespace FitnessYounesApp.Controllers
         // 5) Create (POST)
         // حفظ المدرب الجديد في قاعدة البيانات
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Antrenor antrenor)
         {
@@ -86,6 +88,7 @@ namespace FitnessYounesApp.Controllers
 
         // 6) Edit (GET)
         // عرض بيانات المدرب في نموذج التعديل
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -107,6 +110,7 @@ namespace FitnessYounesApp.Controllers
         // حفظ التعديلات على المدرب
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, Antrenor antrenor)
         {
             if (id != antrenor.Id) return NotFound();
@@ -140,6 +144,7 @@ namespace FitnessYounesApp.Controllers
 
         // 8) Delete (GET)
         // عرض صفحة تأكيد حذف المدرب
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -157,6 +162,7 @@ namespace FitnessYounesApp.Controllers
         // تنفيذ عملية الحذف فعليا
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var antrenor = await _context.Antrenorler.FindAsync(id);
@@ -171,6 +177,7 @@ namespace FitnessYounesApp.Controllers
 
         // 10) HizmetleriDuzenle (GET)
         // عرض كل الخدمات على شكل checkboxes لمدرب معيّن
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> HizmetleriDuzenle(int id)
         {
             var antrenor = await _context.Antrenorler
@@ -205,6 +212,7 @@ namespace FitnessYounesApp.Controllers
         // استلام الخدمات المختارة وتحديث جدول AntrenorHizmetleri
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> HizmetleriDuzenle(int antrenorId, int[] seciliHizmetler)
         {
             var antrenor = await _context.Antrenorler

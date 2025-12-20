@@ -7,7 +7,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">Yeni Randevu Oluştur</h2>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">← Randevu listesine dön</a>
+        <a asp-action="MyRandevular" class="btn btn-outline-secondary btn-sm">← Randevularım</a>
     </div>
 
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
@@ -17,7 +17,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
 
-                    <form asp-action="Create">
+                    <form asp-action="Create" method="post">
 
                         <h5 class="mb-3">Temel Bilgiler</h5>
                         <hr />
@@ -48,54 +48,34 @@
                             <span asp-validation-for="AntrenorId" class="text-danger"></span>
                         </div>
 
-                        <!-- Uye -->
-                        <div class="mb-3">
-                            <label asp-for="UyeProfilId" class="form-label"></label>
-                            <select asp-for="UyeProfilId" class="form-select" asp-items="ViewBag.UyeProfilId">
-                                <option value="">-- Üye seçin --</option>
-                            </select>
-                            <span asp-validation-for="UyeProfilId" class="text-danger"></span>
-                        </div>
-
                         <h5 class="mt-4 mb-3">Zaman ve Ücret</h5>
                         <hr />
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Baslangic" class="form-label"></label>
-                                <input asp-for="Baslangic" class="form-control" type="datetime-local" />
-                                <span asp-validation-for="Baslangic" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Bitis" class="form-label"></label>
-                                <input asp-for="Bitis" class="form-control" type="datetime-local" />
-                                <span asp-validation-for="Bitis" class="text-danger"></span>
-                            </div>
+                        <!-- ✅ Tek tarih+saat -->
+                        <div class="mb-3">
+                            <label class="form-label">Randevu Tarihi ve Saati</label>
+                            <input type="datetime-local"
+                                   class="form-control"
+                                   name="RandevuTarihSaat"
+                                   value="@(ViewData["RandevuTarihSaat"] ?? "")"
+                                   required />
                         </div>
 
-                        <!-- Ucret -->
+                        <!-- Ücret (otomatik) -->
                         <div class="mb-3">
-                            <label asp-for="Ucret" class="form-label"></label>
+                            <label class="form-label">Ücret</label>
                             <div class="input-group">
                                 <span class="input-group-text">₺</span>
-                                <input asp-for="Ucret" class="form-control" />
+                                <input id="UcretDisplay" class="form-control" readonly />
                             </div>
-                            <span asp-validation-for="Ucret" class="text-danger"></span>
-                        </div>
 
-                        <!-- Durum -->
-                        <div class="mb-4">
-                            <label asp-for="Durum" class="form-label"></label>
-                            <select asp-for="Durum" class="form-select" asp-items="Html.GetEnumSelectList<FitnessYounesApp.Models.RandevuDurumu>()">
-                                <option value="">-- Durum seçin --</option>
-                            </select>
-                            <span asp-validation-for="Durum" class="text-danger"></span>
+                            <!-- (opsiyonel) -->
+                            <input type="hidden" asp-for="Ucret" id="Ucret" />
                         </div>
 
                         <div class="d-flex justify-content-between">
                             <button type="submit" class="btn btn-primary">Randevu Oluştur</button>
-                            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+                            <a asp-action="MyRandevular" class="btn btn-outline-secondary">İptal</a>
                         </div>
 
                     </form>
@@ -115,35 +95,55 @@
         const hizmetSelect = document.getElementById("HizmetId");
         const salonSelect = document.getElementById("SporSalonuId");
         const antrenorSelect = document.getElementById("AntrenorId");
+        const ucretHidden = document.getElementById("Ucret");
+        const ucretDisplay = document.getElementById("UcretDisplay");
 
         function resetSalon(message = "-- Spor Salonu seçin --") {
             salonSelect.innerHTML = `<option value="">${message}</option>`;
+            salonSelect.value = "";
             salonSelect.disabled = true;
         }
 
         function resetAntrenor(message = "-- Antrenör seçin --") {
             antrenorSelect.innerHTML = `<option value="">${message}</option>`;
+            antrenorSelect.value = "";
             antrenorSelect.disabled = true;
         }
 
-        // ✅ Hizmet -> Salon
+        // ✅ Hizmet değişince: Ücret + Salonlar
         hizmetSelect.addEventListener("change", async function () {
             resetSalon();
             resetAntrenor();
 
             const hizmetId = this.value;
+
+            ucretHidden.value = "";
+            ucretDisplay.value = "";
+
             if (!hizmetId) return;
 
+            // 1) ✅ Ücret getir
+            try {
+                const resU = await fetch(`/Randevular/GetUcretByHizmet?hizmetId=${encodeURIComponent(hizmetId)}`);
+                if (resU.ok) {
+                    const dataU = await resU.json();
+                    const ucret = dataU?.ucret ?? "";
+                    ucretHidden.value = ucret;
+                    ucretDisplay.value = ucret;
+                }
+            } catch (e) {
+                console.error("Ucret fetch error:", e);
+            }
+
+            // 2) ✅ Salonları getir
             try {
                 const res = await fetch(`/Randevular/GetSporSalonlariByHizmet?hizmetId=${encodeURIComponent(hizmetId)}`);
                 if (!res.ok) {
-                    console.error("GetSporSalonlariByHizmet failed:", res.status);
                     resetSalon("Salonlar yüklenemedi");
                     return;
                 }
 
                 const data = await res.json();
-
                 if (!Array.isArray(data) || data.length === 0) {
                     resetSalon("Bu hizmet için salon yok");
                     return;
@@ -156,14 +156,14 @@
                     salonSelect.appendChild(opt);
                 });
 
-                salonSelect.disabled = false; // ✅ افتح النادي
+                salonSelect.disabled = false;
             } catch (err) {
                 console.error("Salon fetch error:", err);
                 resetSalon("Salonlar yüklenemedi");
             }
         });
 
-        // ✅ Salon -> Antrenor
+        // ✅ Salon değişince: Antrenörler
         salonSelect.addEventListener("change", async function () {
             resetAntrenor();
 
@@ -177,13 +177,11 @@
                 const res = await fetch(url);
 
                 if (!res.ok) {
-                    console.error("GetAntrenorlerByHizmetVeSalon failed:", res.status);
                     resetAntrenor("Antrenörler yüklenemedi");
                     return;
                 }
 
                 const data = await res.json();
-
                 if (!Array.isArray(data) || data.length === 0) {
                     resetAntrenor("Bu salon için antrenör yok");
                     return;
@@ -196,13 +194,11 @@
                     antrenorSelect.appendChild(opt);
                 });
 
-                antrenorSelect.disabled = false; // ✅ افتح المدربين
+                antrenorSelect.disabled = false;
             } catch (err) {
                 console.error("Antrenor fetch error:", err);
                 resetAntrenor("Antrenörler yüklenemedi");
             }
         });
     </script>
-
-
 }

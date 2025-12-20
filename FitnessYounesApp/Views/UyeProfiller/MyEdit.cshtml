@@ -1,0 +1,55 @@
+﻿@model FitnessYounesApp.Models.UyeProfil
+
+@{
+    ViewData["Title"] = "Profilimi Düzenle";
+}
+
+<h2>Profilimi Düzenle</h2>
+<hr />
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-action="MyEdit" method="post">
+    <div class="mb-3">
+        <label asp-for="AdSoyad" class="form-label"></label>
+        <input asp-for="AdSoyad" class="form-control" />
+        <span asp-validation-for="AdSoyad" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DogumTarihi" class="form-label"></label>
+        <input asp-for="DogumTarihi" type="date" class="form-control" />
+        <span asp-validation-for="DogumTarihi" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BoyCm" class="form-label"></label>
+        <input asp-for="BoyCm" class="form-control" />
+        <span asp-validation-for="BoyCm" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="KiloKg" class="form-label"></label>
+        <input asp-for="KiloKg" class="form-control" />
+        <span asp-validation-for="KiloKg" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Cinsiyet" class="form-label"></label>
+        <select asp-for="Cinsiyet" class="form-select">
+            <option value="">Seçiniz</option>
+            <option value="Erkek">Erkek</option>
+            <option value="Kadin">Kadın</option>
+        </select>
+        <span asp-validation-for="Cinsiyet" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Kaydet</button>
+    <a asp-action="MyDetails" class="btn btn-secondary">İptal</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
