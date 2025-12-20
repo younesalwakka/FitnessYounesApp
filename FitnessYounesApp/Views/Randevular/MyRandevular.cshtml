@@ -1,0 +1,49 @@
+﻿@model IEnumerable<FitnessYounesApp.Models.Randevu>
+
+@{
+    ViewData["Title"] = "Randevularım";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Randevularım</h2>
+        <a asp-action="Create" class="btn btn-primary btn-sm">+ Yeni Randevu</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Henüz randevunuz yok.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Başlangıç</th>
+                        <th>Bitiş</th>
+                        <th>Antrenör</th>
+                        <th>Hizmet</th>
+                        <th>Ücret</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Baslangic.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@item.Bitis.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@(item.Antrenor != null ? (item.Antrenor.Ad + " " + item.Antrenor.Soyad) : "-")</td>
+                            <td>@(item.Hizmet != null ? item.Hizmet.Ad : "-")</td>
+                            <td>@item.Ucret</td>
+                            <td>@item.Durum</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

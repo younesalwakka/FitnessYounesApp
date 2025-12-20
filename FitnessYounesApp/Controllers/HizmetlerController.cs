@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FitnessYounesApp.Data;
 using FitnessYounesApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FitnessYounesApp.Controllers
 {
@@ -46,6 +47,7 @@ namespace FitnessYounesApp.Controllers
         }
 
         // GET: Hizmets/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["SporSalonuId"] = new SelectList(_context.SporSalonlari, "Id", "Ad");
@@ -57,6 +59,7 @@ namespace FitnessYounesApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Ad,Aciklama,SureDakika,Ucret,SporSalonuId")] Hizmet hizmet)
         {
             if (ModelState.IsValid)
@@ -70,6 +73,7 @@ namespace FitnessYounesApp.Controllers
         }
 
         // GET: Hizmets/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -91,6 +95,7 @@ namespace FitnessYounesApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Ad,Aciklama,SureDakika,Ucret,SporSalonuId")] Hizmet hizmet)
         {
             if (id != hizmet.Id)
@@ -123,6 +128,7 @@ namespace FitnessYounesApp.Controllers
         }
 
         // GET: Hizmets/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -144,6 +150,7 @@ namespace FitnessYounesApp.Controllers
         // POST: Hizmets/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var hizmet = await _context.Hizmetler.FindAsync(id);

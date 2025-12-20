@@ -35,19 +35,43 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Ai" asp-action="Index">🤖 AI Önerisi</a>
                         </li>
+
+                        @* ====== RANDEVU MENÜSÜ (Role'e göre) ====== *@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Randevular" asp-action="Index">Randevular</a>
-                            </li>
-                            @if (User.IsInRole("Admin"))
+                            if (User.IsInRole("Admin"))
                             {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Randevular" asp-action="Index">Randevular</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="AntrenorMusaitlikler" asp-action="Index">
+                                        Antrenör Müsaitlikleri
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link text-dark fw-bold" asp-area="" asp-controller="Dashboard" asp-action="Index">📊 Dashboard</a>
                                 </li>
                             }
+                            else
+                            {
+                                @* ✅ PROFILIM sadece müşteride (Admin değilken) *@
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="UyeProfiller" asp-action="MyDetails">Profilim</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Randevular" asp-action="Create">Randevu Al</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Randevular" asp-action="MyRandevular">Randevularım</a>
+                                </li>
+                            }
                         }
                     </ul>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>

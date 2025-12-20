@@ -17,7 +17,7 @@ namespace FitnessYounesApp.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -118,6 +118,7 @@ namespace FitnessYounesApp.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Ucret")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -151,6 +152,7 @@ namespace FitnessYounesApp.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Ucret")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UyeProfilId")
@@ -214,6 +216,9 @@ namespace FitnessYounesApp.Data.Migrations
                     b.Property<DateTime?>("DogumTarihi")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("IdentityUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<double?>("KiloKg")
                         .HasColumnType("float");
 
@@ -222,6 +227,8 @@ namespace FitnessYounesApp.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdentityUserId");
 
                     b.ToTable("UyeProfiller");
                 });
@@ -505,6 +512,15 @@ namespace FitnessYounesApp.Data.Migrations
                     b.Navigation("Hizmet");
 
                     b.Navigation("UyeProfil");
+                });
+
+            modelBuilder.Entity("FitnessYounesApp.Models.UyeProfil", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
+                        .WithMany()
+                        .HasForeignKey("IdentityUserId");
+
+                    b.Navigation("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
